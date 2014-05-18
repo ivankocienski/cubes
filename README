@@ -1,0 +1,6 @@
+
+Spinny Cubes!
+
+Had an idea for a screen saver thing involving an infinite grid of cubes that the camera would fly around.
+
+Not the most efficient code, but it does use call lists and quaternions (so the camera rotation is very smooth).
