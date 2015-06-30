@@ -8,9 +8,12 @@
 #include <iostream>
 
 #include <GL/gl.h>
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <string.h>
+#include "third-party/png++/png.hpp"
 
 #include "cube-grid.hh"
 
@@ -22,20 +25,46 @@ CubeGrid::CubeGrid() {
 
 void CubeGrid::init() {
 
-	float x, y, z;
+  {
+    png::image< png::rgb_pixel >image;
+    image.read("data/texture.png");
 
+    int width  = image.get_width();
+    int height = image.get_height();
 
-	glGenTextures(1, &m_texture);
+    vector<unsigned char> buffer( width * height * 3 );
+    unsigned char *d = buffer.data();
 
-	glBindTexture( GL_TEXTURE_2D, m_texture);
+    for( int y = 0; y < height; y++ ) {
 
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+      png::image< png::rgb_pixel >::row_type const & row = image.get_row(y);
 
-	if( !glfwLoadTexture2D( "texture.tga", GLFW_ORIGIN_UL_BIT ) ) {
-		cerr << "could not load texture" << endl;
-		exit(-1);
-	}
+      for(int x = 0; x < width; x++ ) {
+
+        *d = row.at(x).red;   d++;
+        *d = row.at(x).green; d++;
+        *d = row.at(x).blue;  d++;
+      }
+    }
+
+    glGenTextures( 1, &m_texture );
+    glBindTexture( GL_TEXTURE_2D, m_texture);
+
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGB,
+        width,
+        height,
+        0, // border
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        buffer.data()
+    );
+  }
 
 	glBindTexture( GL_TEXTURE_2D, m_texture);
 	
@@ -45,6 +74,8 @@ void CubeGrid::init() {
 	glNewList(m_cubeList, GL_COMPILE);
 
 	glBegin(GL_QUADS);
+
+	float x, y, z; 
 
 	for(z = -5.5; z < 5.5; z += 1.0)
 		for(y = -5.5; y < 5.5; y += 1.0)

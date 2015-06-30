@@ -10,10 +10,12 @@
 #include <string.h>
 #include <time.h>
 #include <GL/gl.h>
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
+#include "globals.hh"
 #include "scene.hh"
 
+GLFWwindow *main_window = NULL;
 static Scene scene;
 
 static void init() {
@@ -26,13 +28,13 @@ static void init() {
 	}
 
 	// Open OpenGL window
-	if( !glfwOpenWindow( 640, 480, 8, 8, 8, 8, 32, 0, GLFW_WINDOW)) {
+  main_window = glfwCreateWindow( 640, 480, "cubes", NULL, NULL);
+	if( !main_window ) {
 		printf("could not open window\n");
 		exit(-1);
 	}
 
-	// Set tile
-	glfwSetWindowTitle("CUBES!");
+  glfwMakeContextCurrent(main_window);
 
 	scene.init();
 }

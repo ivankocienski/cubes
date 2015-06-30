@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 #include <GL/gl.h>
+#include <GL/glu.h>
 
+#include "globals.hh"
 #include "scene.hh"
 
 void Scene::run() {
@@ -14,7 +16,7 @@ void Scene::run() {
 	ts.tv_sec = 0;
 	ts.tv_nsec = 25 * 1000000; /* 10 ms */
 	
-	while( glfwGetWindowParam( GLFW_OPENED ) ) {
+	while( !glfwWindowShouldClose( main_window ) ) {
 
 		m_camera.animate();
 
@@ -31,7 +33,7 @@ void Scene::run() {
 		m_cubeGrid.draw();
 
 		// Swap buffers
-		glfwSwapBuffers();
+		glfwSwapBuffers(main_window);
 
 		nanosleep( &ts, NULL );
 	}
